@@ -322,6 +322,7 @@ public class Main extends JavaPlugin implements Listener {
                 player.setDisplayName(colourFormat(format + "&r"));
             }
         } else {
+            getLogger().info("No nick found for "+player.getName()+" | "+player.getUniqueId());
             User u = new User();
             u.setUsername(player.getName());
             users.put(player.getUniqueId().toString(),u);
@@ -329,7 +330,7 @@ public class Main extends JavaPlugin implements Listener {
 
         // Set their player object.
         users.get(uid).setPlayer(player);
-
+        // Update their request status
         requestStatus(player);
     }
 
@@ -499,13 +500,16 @@ public class Main extends JavaPlugin implements Listener {
     /* When a user hasn't been on for a while */
     @SuppressWarnings("unused")
     public void onExpire(PlayerExpiredEvent event) {
+        int expired = 0;
         List<OfflinePlayer> players = event.getPlayers();
         for (OfflinePlayer p : players) {
             User u = userViaName(p.getName());
             if (u != null) {
                 users.remove(u.getUsername()); // I assume.
+                expired++;
             }
         }
+        getLogger().info(expired+" Nicknames and Requests expired out of "+players.size());
     }
 
     // Vault Support
