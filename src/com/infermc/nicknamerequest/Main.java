@@ -131,7 +131,7 @@ public class Main extends JavaPlugin implements Listener {
 
                             for (Player p : getServer().getOnlinePlayers()) {
                                 if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&aThe nickname '"+u.getRequest().getNickname()+ "&a' by "+u.getUsername()+" has been &laccepted&r&a by "+sender.getName()));
+                                    p.sendMessage(colourFormat("&bThe nickname '"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &a&laccepted&r&b by "+sender.getName()));
                                 }
                             }
 
@@ -158,7 +158,7 @@ public class Main extends JavaPlugin implements Listener {
 
                             for (Player p : getServer().getOnlinePlayers()) {
                                 if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&aThe nickname '"+u.getRequest().getNickname()+ "&a' by "+u.getUsername()+" has been &ldenied&r&a by "+sender.getName()));
+                                    p.sendMessage(colourFormat("&bThe nickname '"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &c&ldenied&r&b by "+sender.getName()));
                                 }
                             }
 
@@ -212,7 +212,7 @@ public class Main extends JavaPlugin implements Listener {
                         if (u.getValue().getRequest().isWaiting()) {
                             User user = u.getValue();
                             String nick = colourFormat(user.getRequest().getNickname() + "&r");
-                            sender.sendMessage(colourFormat("   &9- " + nick + "&9 by " + user.getUsername()));
+                            sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
                             count++;
                         }
                     }
@@ -248,6 +248,11 @@ public class Main extends JavaPlugin implements Listener {
                     }
                 }
                 return true;
+            } else if (args[0].equalsIgnoreCase("version")) {
+                sender.sendMessage(colourFormat("NicknameRequest version 0.3"));
+                sender.sendMessage(colourFormat("Nickname Requester - Easy nicknaming for users and staff."));
+                sender.sendMessage(colourFormat("Author: Thomas Edwards (TMFKSOFT/MajesticFudgie)"));
+
             }
         } else {
             return false;

@@ -2,14 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c6480922-6bc8-48f6-857f-125d5c76ef2f" name="Default" comment="">
-      <change type="DELETED" beforePath="E:\Users\Thomas\Development\Bukkit\Dev\workspace\NicknameRequest\.idea\libraries\Maven__com_infermc_stale_s_1_8_R0_1_SNAPSHOT.xml" afterPath="" />
+      <change type="DELETED" beforePath="E:\Users\Thomas\Development\Bukkit\Dev\workspace\NicknameRequest\target\NicknameRequest.jar" afterPath="" />
+      <change type="DELETED" beforePath="E:\Users\Thomas\Development\Bukkit\Dev\workspace\NicknameRequest\target\users.yml" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/com/infermc/nicknamerequest/Main.class" afterPath="$PROJECT_DIR$/target/classes/com/infermc/nicknamerequest/Main.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/infermc/nicknamerequest/Main.java" afterPath="$PROJECT_DIR$/src/com/infermc/nicknamerequest/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__StaleAPI_com_infermc_stale_1_0_SNAPSHOT.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__StaleAPI_com_infermc_stale_1_0_SNAPSHOT.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__net_md_5_bungeecord_chat_1_8_SNAPSHOT.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__net_md_5_bungeecord_chat_1_8_SNAPSHOT.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/plugin.yml" afterPath="$PROJECT_DIR$/resources/plugin.yml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/classes/plugin.yml" afterPath="$PROJECT_DIR$/target/classes/plugin.yml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="NicknameRequest.iws" />
@@ -59,12 +55,14 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/infermc/nicknamerequest/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.65806454" vertical-offset="2091" max-vertical-offset="7786">
-              <caret line="141" column="28" selection-start-line="141" selection-start-column="28" selection-end-line="141" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.3655914" vertical-offset="3468" max-vertical-offset="7905">
+              <caret line="214" column="80" selection-start-line="214" selection-start-column="80" selection-end-line="214" selection-end-column="80" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#21812#21813#0" expanded="true" />
-                <element signature="e#21844#21845#0" expanded="true" />
+                <element signature="e#13240#13241#0" expanded="true" />
+                <element signature="e#13285#13286#0" expanded="true" />
+                <element signature="e#22177#22178#0" expanded="true" />
+                <element signature="e#22209#22210#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -464,20 +462,28 @@
       <option name="number" value="Default" />
       <updated>1431143447794</updated>
     </task>
+    <task id="LOCAL-00001" summary="Version 0.3 - Added notifications to all notify permission holders when a nickname is accepted/denied.">
+      <created>1436340723053</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1436340723053</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32972136" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13689604" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13689604" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21671827" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -510,6 +516,8 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
+    <MESSAGE value="Version 0.3 - Added notifications to all notify permission holders when a nickname is accepted/denied." />
+    <option name="LAST_COMMIT_MESSAGE" value="Version 0.3 - Added notifications to all notify permission holders when a nickname is accepted/denied." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -538,8 +546,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -593,8 +603,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -648,8 +660,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -703,8 +717,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -758,8 +774,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -813,8 +831,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -860,8 +880,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -907,8 +929,10 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -976,12 +1000,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/infermc/nicknamerequest/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.65806454" vertical-offset="2091" max-vertical-offset="7786">
-          <caret line="141" column="28" selection-start-line="141" selection-start-column="28" selection-end-line="141" selection-end-column="28" />
+        <state vertical-scroll-proportion="0.3655914" vertical-offset="3468" max-vertical-offset="7905">
+          <caret line="214" column="80" selection-start-line="214" selection-start-column="80" selection-end-line="214" selection-end-column="80" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#21812#21813#0" expanded="true" />
-            <element signature="e#21844#21845#0" expanded="true" />
+            <element signature="e#13240#13241#0" expanded="true" />
+            <element signature="e#13285#13286#0" expanded="true" />
+            <element signature="e#22177#22178#0" expanded="true" />
+            <element signature="e#22209#22210#0" expanded="true" />
           </folding>
         </state>
       </provider>
