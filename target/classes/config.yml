@@ -1,0 +1,36 @@
+# NickRequest by Thomas Edwards
+# Theres only language based stuff to configure here
+# Everything else is handled via permissions.
+
+# Formatting Controls, True by default
+# See formatting/colours here: http://minecraft.gamepedia.com/Formatting_codes
+formatting:
+   bold: true
+   italic: true
+   underline: true
+   strikethrough: true
+   obfuscated: true
+
+colours:
+   black: true
+   dark_blue: true
+   dark_green: true
+   dark_aqua: true
+   dark_red: true
+   dark_purple: true
+   gold: true
+   gray: true
+   dark_gray: true
+   blue: true
+   green: true
+   aqua: true
+   red: true
+   light_purple: true
+   yellow: true
+   white: true
+
+# Messages, Edit to suit
+messages:
+   approved: "Your Nickname '$nick' was approved and applied!"
+   denied: "Your Nickname '$nick' was approved and wasn't applied!"
+   waiting: "Your Nickname '$nick' is still awaiting approval."
