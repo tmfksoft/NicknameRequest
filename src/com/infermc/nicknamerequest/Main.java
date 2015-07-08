@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,6 +37,7 @@ public class Main extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
+
         getLogger().info("NicknameRequest Enabled ~ Yeey");
 
         // Load Saved Data
@@ -291,7 +293,6 @@ public class Main extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        getLogger().info("Player joined");
         customJoin(event.getPlayer());
     }
 
@@ -303,8 +304,10 @@ public class Main extends JavaPlugin implements Listener {
     // Custom functions
     public void customJoin(Player player) {
         String uid = player.getUniqueId().toString();
+        getLogger().info("A user has joined "+player.getName());
         // If we loaded their nick, apply it!
         if (users.containsKey(uid)) {
+            getLogger().info("They have a nick? Applying?");
             users.get(uid).setUsername(player.getName());
             if (users.get(uid).getNickname() != null) {
                 String nickname = users.get(uid).getNickname();
@@ -320,6 +323,8 @@ public class Main extends JavaPlugin implements Listener {
                 }
 
                 player.setDisplayName(colourFormat(format + "&r"));
+            } else {
+                getLogger().info("No nick, Unable to apply :(");
             }
         } else {
             getLogger().info("No nick found for "+player.getName()+" | "+player.getUniqueId());
@@ -498,7 +503,7 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     /* When a user hasn't been on for a while */
-    @SuppressWarnings("unused")
+    /*
     public void onExpire(PlayerExpiredEvent event) {
         int expired = 0;
         List<OfflinePlayer> players = event.getPlayers();
@@ -511,7 +516,7 @@ public class Main extends JavaPlugin implements Listener {
         }
         getLogger().info(expired+" Nicknames and Requests expired out of "+players.size());
     }
-
+    */
     // Vault Support
     private boolean setupVault(){
         // Check if its loaded.
