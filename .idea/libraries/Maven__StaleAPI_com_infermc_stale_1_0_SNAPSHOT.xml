@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: StaleAPI:com.infermc.stale:1.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-20150531.214020-1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-SNAPSHOT.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-20150531.214020-1-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-SNAPSHOT-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-20150531.214020-1-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/StaleAPI/com.infermc.stale/1.0-SNAPSHOT/com.infermc.stale-1.0-SNAPSHOT-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

@@ -128,6 +128,13 @@ public class Main extends JavaPlugin implements Listener {
                             u.getRequest().setWaiting(false);
                             u.getRequest().setStatus(true);
                             sender.sendMessage(colourFormat("&aNickname successfully accepted."));
+
+                            for (Player p : getServer().getOnlinePlayers()) {
+                                if (p.hasPermission("nicknamerequest.notify")) {
+                                    p.sendMessage(colourFormat("&aThe nickname '"+u.getRequest().getNickname()+ "&a' by "+u.getUsername()+" has been &laccepted&r&a by "+sender.getName()));
+                                }
+                            }
+
                             if (u.getPlayer() != null) customJoin(u.getPlayer());
                         } else {
                             sender.sendMessage(colourFormat("&cThat user hasn't requested a nickname!"));
@@ -148,6 +155,13 @@ public class Main extends JavaPlugin implements Listener {
                             u.getRequest().setStatus(false);
                             sender.sendMessage(colourFormat("&aNickname successfully denied."));
                             if (u.getPlayer() != null) customJoin(u.getPlayer());
+
+                            for (Player p : getServer().getOnlinePlayers()) {
+                                if (p.hasPermission("nicknamerequest.notify")) {
+                                    p.sendMessage(colourFormat("&aThe nickname '"+u.getRequest().getNickname()+ "&a' by "+u.getUsername()+" has been &ldenied&r&a by "+sender.getName()));
+                                }
+                            }
+
                         } else {
                             sender.sendMessage(colourFormat("&cThat user hasn't requested a nickname!"));
                         }

@@ -6,12 +6,12 @@
 
 <groupId>NicknameRequest</groupId>
 <artifactId>com.infermc.nicknamerequest</artifactId>
-<version>1.0-SNAPSHOT</version>
+<version>0.3</version>
 <build>
     <sourceDirectory>src</sourceDirectory>
     <defaultGoal>clean package</defaultGoal>
     <directory>target</directory>
-    <finalName>NicknameRequest</finalName>
+    <finalName>${project.groupId}-${project.version}-SNAPSHOT</finalName>
     <plugins>
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>

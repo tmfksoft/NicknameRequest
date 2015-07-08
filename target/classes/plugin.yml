@@ -2,7 +2,7 @@ name: NicknameRequest
 main: com.infermc.nicknamerequest.Main
 description: Nickname Requester - Easy nicknaming for users and staff.
 author: Thomas Edwards (TMFKSOFT/MajesticFudgie)
-version: 0.2
+version: 0.3
 commands:
    nick:
      description: Nickname Control, Check request status, Request a nickname, Disable your nickname.
