@@ -1,6 +1,7 @@
 package com.infermc.nicknamerequest;
 
 import com.infermc.stale.PlayerDataExpired;
+import net.milkbowl.vault.chat.Chat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,11 +13,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Permission;
 import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
@@ -26,6 +28,10 @@ public class Main extends JavaPlugin implements Listener {
     // Temporary Storage
     private HashMap<String,User> users = new HashMap<String,User>();
 
+    // Providers
+    Permission perms;
+    Chat chat;
+
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(this, this);
@@ -33,6 +39,7 @@ public class Main extends JavaPlugin implements Listener {
 
         // Load Saved Data
         loadUsers();
+        setupVault();
 
         // Process currently logged in users (aka /reload)
         for (Player p : getServer().getOnlinePlayers()) {
@@ -212,7 +219,18 @@ public class Main extends JavaPlugin implements Listener {
                         if (u.getValue().getRequest().isWaiting()) {
                             User user = u.getValue();
                             String nick = colourFormat(user.getRequest().getNickname() + "&r");
-                            sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
+                            if (perms != null && chat != null) {
+                                String group;
+                                if (user.getPlayer() != null) {
+                                    group = chat.getPrimaryGroup(user.getPlayer());
+                                } else {
+                                    // A feeble attempt.
+                                    group = chat.getPrimaryGroup(getServer().getWorlds().get(0).getName(),getServer().getOfflinePlayer(user.getRequest().getUUID()));
+                                }
+                                sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()+" ("+group+")"));
+                            } else {
+                                sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
+                            }
                             count++;
                         }
                     }
@@ -401,7 +419,9 @@ public class Main extends JavaPlugin implements Listener {
             }
             if (u.getValue().getRequest() != null) {
                 // Check if this users request matches.
-                if (u.getValue().getRequest().getNickname().equalsIgnoreCase(nick)) return true;
+                String reqNick = ChatColor.stripColor(colourFormat(u.getValue().getRequest().getNickname()));
+                String prepNick = ChatColor.stripColor(colourFormat(nick));
+                if (reqNick.equalsIgnoreCase(prepNick)) return true;
             }
         }
 
@@ -455,7 +475,32 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     /* When a user hasn't been on for a while */
+    @SuppressWarnings("unused")
     public void onExpire(PlayerDataExpired event) {
         event.isCheese();
+    }
+
+    // Vault Support
+    private boolean setupVault(){
+        // Check if its loaded.
+        if (getServer().getPluginManager().getPlugin("Vault") == null) return false;
+
+        // Attempt to register perms.
+        if (!setupPerms()) return false;
+        if (!setupChat()) return false;
+
+        return true;
+    }
+    private boolean setupPerms() {
+        // Attempt to register perms.
+        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        perms = rsp.getProvider();
+        return perms != null;
+    }
+    private boolean setupChat() {
+        // Attempt to register perms.
+        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        chat = rsp.getProvider();
+        return chat != null;
     }
 }
