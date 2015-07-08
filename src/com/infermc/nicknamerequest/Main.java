@@ -131,7 +131,7 @@ public class Main extends JavaPlugin implements Listener {
 
                             for (Player p : getServer().getOnlinePlayers()) {
                                 if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&bThe nickname '"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &a&laccepted&r&b by "+sender.getName()));
+                                    p.sendMessage(colourFormat("&bThe nickname '&r&f"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &a&laccepted&r&b by "+sender.getName()));
                                 }
                             }
 
@@ -158,7 +158,7 @@ public class Main extends JavaPlugin implements Listener {
 
                             for (Player p : getServer().getOnlinePlayers()) {
                                 if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&bThe nickname '"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &c&ldenied&r&b by "+sender.getName()));
+                                    p.sendMessage(colourFormat("&bThe nickname '&r&f"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &c&ldenied&r&b by "+sender.getName()));
                                 }
                             }
 
