@@ -3,7 +3,7 @@ main: com.infermc.nicknamerequest.Main
 description: Nickname Requester - Easy nicknaming for users and staff.
 author: Thomas Edwards (TMFKSOFT/MajesticFudgie)
 softdepend: [Vault,StaleAPI]
-version: 0.3
+version: 0.4
 commands:
    nick:
      description: Nickname Control, Check request status, Request a nickname, Disable your nickname.

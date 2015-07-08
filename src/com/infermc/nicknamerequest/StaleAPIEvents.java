@@ -2,14 +2,12 @@ package com.infermc.nicknamerequest;
 
 import com.infermc.stale.PlayerExpiredEvent;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * Created by Thomas on 08/07/2015.
- */
 public class StaleAPIEvents implements Listener {
     private Main parent;
 
@@ -17,13 +15,14 @@ public class StaleAPIEvents implements Listener {
         this.parent = p;
     }
 
+    @EventHandler
     public void onExpire(PlayerExpiredEvent event) {
         int expired = 0;
         List<OfflinePlayer> players = event.getPlayers();
         for (OfflinePlayer p : players) {
             User u = parent.userViaName(p.getName());
             if (u != null) {
-                parent.getUsers().remove(u.getRequest().getUUID()); // I assume.
+                parent.getUsers().remove(u.getRequest().getUUID().toString()); // I assume.
                 expired++;
             }
         }

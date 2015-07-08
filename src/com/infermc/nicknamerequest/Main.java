@@ -1,10 +1,8 @@
 package com.infermc.nicknamerequest;
 
-import com.infermc.stale.PlayerExpiredEvent;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -285,7 +282,7 @@ public class Main extends JavaPlugin implements Listener {
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("version")) {
-                sender.sendMessage(colourFormat("NicknameRequest version 0.3"));
+                sender.sendMessage(colourFormat("NicknameRequest version 0.4"));
                 sender.sendMessage(colourFormat("Nickname Requester - Easy nicknaming for users and staff."));
                 sender.sendMessage(colourFormat("Author: Thomas Edwards (TMFKSOFT/MajesticFudgie)"));
 
@@ -499,6 +496,7 @@ public class Main extends JavaPlugin implements Listener {
 
         // Colours - Light
         if (nick.contains("&d") && !player.hasPermission("nicknamerequest.allow.light_purple")) return false;
+
         return true;
     }
     // Vault Support
