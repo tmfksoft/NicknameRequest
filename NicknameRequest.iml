@@ -25,5 +25,14 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.md-5:bungeecord-chat:1.8-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.google.code.gson:gson:2.3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.milkbowl.vault:VaultAPI:1.5" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: com.infermc.stale.StaleAPI:StaleAPI:1.1.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/StaleAPI-1.1.1-Alpha-SNAPSHOT.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

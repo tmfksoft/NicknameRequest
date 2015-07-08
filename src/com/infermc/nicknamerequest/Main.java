@@ -1,6 +1,7 @@
 package com.infermc.nicknamerequest;
 
 import com.infermc.stale.PlayerDataExpired;
+import com.infermc.stale.StaleAPI;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -39,7 +40,14 @@ public class Main extends JavaPlugin implements Listener {
 
         // Load Saved Data
         loadUsers();
-        setupVault();
+        if(!setupVault()){
+            getLogger().info("Unable to load Vault, Group names won't be shown in the request list!");
+        }
+        if (getServer().getPluginManager().getPlugin("StaleAPI") == null) {
+            getLogger().info("Unable to load StaleAPI, Nicknames and requests will never expire. (NicknameRequest could start to lag)");
+        } else {
+            getLogger().info("StaleAPI Detected! Nicknames/Requests will expire over time.");
+        }
 
         // Process currently logged in users (aka /reload)
         for (Player p : getServer().getOnlinePlayers()) {
@@ -477,7 +485,7 @@ public class Main extends JavaPlugin implements Listener {
     /* When a user hasn't been on for a while */
     @SuppressWarnings("unused")
     public void onExpire(PlayerDataExpired event) {
-        event.isCheese();
+        //
     }
 
     // Vault Support
