@@ -1,9 +1,10 @@
 package com.infermc.nicknamerequest;
 
-import com.infermc.stale.PlayerDataExpired;
-import com.infermc.stale.StaleAPI;
+import com.infermc.stale.PlayerExpiredEvent;
 import net.milkbowl.vault.chat.Chat;
+import net.milkbowl.vault.permission.Permission;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,7 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Permission;
 import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
@@ -48,6 +48,9 @@ public class Main extends JavaPlugin implements Listener {
         } else {
             getLogger().info("StaleAPI Detected! Nicknames/Requests will expire over time.");
         }
+
+        // Handle config.
+        saveDefaultConfig();
 
         // Process currently logged in users (aka /reload)
         for (Player p : getServer().getOnlinePlayers()) {
@@ -305,7 +308,18 @@ public class Main extends JavaPlugin implements Listener {
             users.get(uid).setUsername(player.getName());
             if (users.get(uid).getNickname() != null) {
                 String nickname = users.get(uid).getNickname();
-                player.setDisplayName(colourFormat(nickname + "&r"));
+
+                String format = getConfig().getString("nick-format");
+
+                format = format.replace("{NICK}",nickname);
+
+                if (perms != null && chat != null) {
+                    format = format.replace("{PREFIX}",chat.getPlayerPrefix(player));
+                    format = format.replace("{SUFFIX}",chat.getPlayerSuffix(player));
+                    format = format.replace("{GROUP}",chat.getPrimaryGroup(player));
+                }
+
+                player.setDisplayName(colourFormat(format + "&r"));
             }
         } else {
             User u = new User();
@@ -484,8 +498,14 @@ public class Main extends JavaPlugin implements Listener {
 
     /* When a user hasn't been on for a while */
     @SuppressWarnings("unused")
-    public void onExpire(PlayerDataExpired event) {
-        //
+    public void onExpire(PlayerExpiredEvent event) {
+        List<OfflinePlayer> players = event.getPlayers();
+        for (OfflinePlayer p : players) {
+            User u = userViaName(p.getName());
+            if (u != null) {
+                users.remove(u.getUsername()); // I assume.
+            }
+        }
     }
 
     // Vault Support
@@ -502,12 +522,14 @@ public class Main extends JavaPlugin implements Listener {
     private boolean setupPerms() {
         // Attempt to register perms.
         RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        if (rsp == null) return false;
         perms = rsp.getProvider();
         return perms != null;
     }
     private boolean setupChat() {
         // Attempt to register perms.
         RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        if (rsp == null) return false;
         chat = rsp.getProvider();
         return chat != null;
     }
