@@ -48,6 +48,7 @@ public class Main extends JavaPlugin implements Listener {
         if (getServer().getPluginManager().getPlugin("StaleAPI") == null) {
             getLogger().info("Unable to load StaleAPI, Nicknames and requests will never expire. (NicknameRequest could start to lag)");
         } else {
+            getServer().getPluginManager().registerEvents(new StaleAPIEvents(this),this);
             getLogger().info("StaleAPI Detected! Nicknames/Requests will expire over time.");
         }
 
@@ -58,6 +59,10 @@ public class Main extends JavaPlugin implements Listener {
         for (Player p : getServer().getOnlinePlayers()) {
             customJoin(p);
         }
+    }
+
+    public HashMap<String,User> getUsers() {
+        return this.users;
     }
 
     @Override
@@ -304,10 +309,8 @@ public class Main extends JavaPlugin implements Listener {
     // Custom functions
     public void customJoin(Player player) {
         String uid = player.getUniqueId().toString();
-        getLogger().info("A user has joined "+player.getName());
         // If we loaded their nick, apply it!
         if (users.containsKey(uid)) {
-            getLogger().info("They have a nick? Applying?");
             users.get(uid).setUsername(player.getName());
             if (users.get(uid).getNickname() != null) {
                 String nickname = users.get(uid).getNickname();
@@ -323,11 +326,8 @@ public class Main extends JavaPlugin implements Listener {
                 }
 
                 player.setDisplayName(colourFormat(format + "&r"));
-            } else {
-                getLogger().info("No nick, Unable to apply :(");
             }
         } else {
-            getLogger().info("No nick found for "+player.getName()+" | "+player.getUniqueId());
             User u = new User();
             u.setUsername(player.getName());
             users.put(player.getUniqueId().toString(),u);
@@ -501,22 +501,6 @@ public class Main extends JavaPlugin implements Listener {
         if (nick.contains("&d") && !player.hasPermission("nicknamerequest.allow.light_purple")) return false;
         return true;
     }
-
-    /* When a user hasn't been on for a while */
-    /*
-    public void onExpire(PlayerExpiredEvent event) {
-        int expired = 0;
-        List<OfflinePlayer> players = event.getPlayers();
-        for (OfflinePlayer p : players) {
-            User u = userViaName(p.getName());
-            if (u != null) {
-                users.remove(u.getUsername()); // I assume.
-                expired++;
-            }
-        }
-        getLogger().info(expired+" Nicknames and Requests expired out of "+players.size());
-    }
-    */
     // Vault Support
     private boolean setupVault(){
         // Check if its loaded.
