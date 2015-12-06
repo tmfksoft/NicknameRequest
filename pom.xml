@@ -4,14 +4,14 @@
                    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>NicknameRequest</groupId>
-    <artifactId>com.infermc.nicknamerequest</artifactId>
-    <version>0.4</version>
+    <groupId>com.infermc.nicknamerequest</groupId>
+    <artifactId>NicknameRequest</artifactId>
+    <version>0.5</version>
     <build>
         <sourceDirectory>src</sourceDirectory>
         <defaultGoal>clean package</defaultGoal>
         <directory>target</directory>
-        <finalName>${project.groupId}-${project.version}-SNAPSHOT</finalName>
+        <finalName>${project.artifactId}-${project.version}-SNAPSHOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -42,7 +42,7 @@
     <repositories>
         <repository>
             <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
             <id>vault-repo</id>
@@ -50,10 +50,12 @@
         </repository>
     </repositories>
     <dependencies>
+        <!--Spigot API-->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

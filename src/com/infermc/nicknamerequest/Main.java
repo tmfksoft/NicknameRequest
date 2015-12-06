@@ -1,5 +1,9 @@
 package com.infermc.nicknamerequest;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.ChatColor;
@@ -15,6 +19,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,9 +105,38 @@ public class Main extends JavaPlugin implements Listener {
                             if (users.get(uid).getRequest() == null) {
                                 // Yes, It's a new request.
                                 sender.sendMessage("Nickname requested!");
+
+                                TextComponent player_str = new TextComponent(colourFormat("&b"+player.getName()));
+                                TextComponent req_str = new TextComponent(colourFormat("&b has requested the nickname '" + args[1]+"&r&b'"));
+                                TextComponent accept = new TextComponent(colourFormat(" &b[ &aAccept &b|"));
+                                TextComponent deny = new TextComponent(colourFormat(" &cDeny &b]"));
+
+                                accept.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick accept "+player.getName() ) );
+                                accept.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Accept nickname").create() ) );
+
+                                deny.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick deny "+player.getName() ) );
+                                deny.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Deny nickname").create() ) );
+
+                                // If theres perms groups. Add them to the message!
+                                if (perms != null && chat != null) {
+                                    String group;
+                                    if (player != null) {
+                                        group = chat.getPrimaryGroup(player);
+                                    } else {
+                                        // A feeble attempt.
+                                        group = chat.getPrimaryGroup(getServer().getWorlds().get(0).getName(),getServer().getOfflinePlayer(player.getUniqueId()));
+                                    }
+                                    TextComponent text_group = new TextComponent(" (" + group + ")");
+
+                                    player_str.addExtra(text_group);
+                                }
+                                player_str.addExtra(req_str);
+                                player_str.addExtra(accept);
+                                player_str.addExtra(deny);
+
                                 for (Player p : getServer().getOnlinePlayers()) {
                                     if (p.hasPermission("nicknamerequest.notify")) {
-                                        p.sendMessage(colourFormat("&b"+player.getName() + " has requested the nickname " + args[1]));
+                                        p.spigot().sendMessage(player_str);
                                     }
                                 }
 
@@ -176,13 +210,14 @@ public class Main extends JavaPlugin implements Listener {
                             u.getRequest().setWaiting(false);
                             u.getRequest().setStatus(false);
                             sender.sendMessage(colourFormat("&aNickname successfully denied."));
-                            if (u.getPlayer() != null) customJoin(u.getPlayer());
 
                             for (Player p : getServer().getOnlinePlayers()) {
                                 if (p.hasPermission("nicknamerequest.notify")) {
                                     p.sendMessage(colourFormat("&bThe nickname '&r&f"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &c&ldenied&r&b by "+sender.getName()));
                                 }
                             }
+
+                            if (u.getPlayer() != null) customJoin(u.getPlayer());
 
                         } else {
                             sender.sendMessage(colourFormat("&cThat user hasn't requested a nickname!"));
@@ -234,6 +269,18 @@ public class Main extends JavaPlugin implements Listener {
                         if (u.getValue().getRequest().isWaiting()) {
                             User user = u.getValue();
                             String nick = colourFormat(user.getRequest().getNickname() + "&r");
+
+                            TextComponent req_str = new TextComponent(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
+                            TextComponent accept = new TextComponent(colourFormat(" &b[ &aAccept &b|"));
+                            TextComponent deny = new TextComponent(colourFormat(" &cDeny &b]"));
+
+                            accept.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick accept "+user.getUsername() ) );
+                            accept.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Accept nickname").create() ) );
+
+                            deny.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick deny "+user.getUsername() ) );
+                            deny.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Deny nickname").create() ) );
+
+                            // If theres perms groups. Add them to the message!
                             if (perms != null && chat != null) {
                                 String group;
                                 if (user.getPlayer() != null) {
@@ -242,9 +289,22 @@ public class Main extends JavaPlugin implements Listener {
                                     // A feeble attempt.
                                     group = chat.getPrimaryGroup(getServer().getWorlds().get(0).getName(),getServer().getOfflinePlayer(user.getRequest().getUUID()));
                                 }
-                                sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()+" ("+group+")"));
+                                TextComponent text_group = new TextComponent(" (" + group + ")");
+
+                                req_str.addExtra(text_group);
+                            }
+
+                            if (sender instanceof Player) {
+                                // If they're a player send the fancy string.
+                                player = (Player) sender;
+
+                                // Only for players, useless as server can't click :P
+                                req_str.addExtra(accept);
+                                req_str.addExtra(deny);
+
+                                player.spigot().sendMessage(req_str);
                             } else {
-                                sender.sendMessage(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
+                                sender.sendMessage(req_str.toLegacyText());
                             }
                             count++;
                         }
@@ -282,7 +342,7 @@ public class Main extends JavaPlugin implements Listener {
                 }
                 return true;
             } else if (args[0].equalsIgnoreCase("version")) {
-                sender.sendMessage(colourFormat("NicknameRequest version 0.4"));
+                sender.sendMessage(colourFormat("NicknameRequest version 0.5"));
                 sender.sendMessage(colourFormat("Nickname Requester - Easy nicknaming for users and staff."));
                 sender.sendMessage(colourFormat("Author: Thomas Edwards (TMFKSOFT/MajesticFudgie)"));
 
