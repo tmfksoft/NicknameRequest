@@ -1,0 +1,4 @@
+= v0.8 =
+- Added NicknameAPI
+- Renamed/Refactored class names to be logical and suitable
+- Added "Nickname Requested!" string to config.
