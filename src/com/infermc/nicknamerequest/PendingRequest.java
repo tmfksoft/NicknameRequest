@@ -15,10 +15,11 @@ public class PendingRequest {
     private NicknameRequest plugin;
     private database db;
 
-    public PendingRequest(NicknameRequest pl, database db, String nick) {
+    public PendingRequest(NicknameRequest pl, database db, String nick, UUID u) {
         this.nickname = nick;
         this.plugin = pl;
         this.db = db;
+        this.uuid = u;
     }
 
     // Setters.
@@ -26,6 +27,7 @@ public class PendingRequest {
         nickname = nick;
     }
 
+    // I deprecated this and I don't know why. :(
     @Deprecated
     public void setUUID(UUID id) { uuid = id; }
     public void setStatus(boolean s) {

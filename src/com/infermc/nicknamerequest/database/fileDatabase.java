@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class fileDatabase extends database {
+public class fileDatabase implements database {
     // Some needed vars
     private NicknameRequest parent;
 
@@ -67,7 +67,7 @@ public class fileDatabase extends database {
                         if (section.getConfigurationSection("request") != null) {
                             ConfigurationSection requestSection = section.getConfigurationSection("request");
                             if (requestSection.contains("nickname")) {
-                                req = new PendingRequest(parent, this, requestSection.getString("nickname"));
+                                req = new PendingRequest(parent, this, requestSection.getString("nickname"), uid);
                                 if (requestSection.contains("waiting")) req.setWaiting(requestSection.getBoolean("waiting"));
                                 if (requestSection.contains("status")) req.setStatus(requestSection.getBoolean("status"));
                             }

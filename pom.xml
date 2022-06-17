@@ -6,7 +6,7 @@
 
     <groupId>com.infermc.nicknamerequest</groupId>
     <artifactId>NicknameRequest</artifactId>
-    <version>0.10</version>
+    <version>0.11</version>
     <build>
         <sourceDirectory>src</sourceDirectory>
         <defaultGoal>clean package</defaultGoal>

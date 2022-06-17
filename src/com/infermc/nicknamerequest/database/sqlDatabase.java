@@ -9,8 +9,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.sql.*;
 import java.util.*;
 
-public class sqlDatabase extends database {
-    private Connection conn = null;
+public class sqlDatabase implements database {
+    private Connection connection = null;
     private NicknameRequest parent;
     private String prefix;
 
@@ -20,7 +20,21 @@ public class sqlDatabase extends database {
         setup();
     }
 
-    private void setup() {
+    public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                Connection conn = createConnection();
+                this.connection = conn;
+                return conn;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            this.connection = null;
+        }
+        return connection;
+    }
+
+    private Connection createConnection() {
         ConfigurationSection databaseConfig = parent.getConfig().getConfigurationSection("database");
         String host = databaseConfig.getString("host");
         String port = databaseConfig.getString("port");
@@ -29,14 +43,27 @@ public class sqlDatabase extends database {
         prefix = databaseConfig.getString("prefix");
         String database = databaseConfig.getString("database");
 
+        Connection conn;
         try {
             conn = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/"+database+"?user="+username+"&password="+password);
+            parent.getLogger().info("Connected to database!");
+            return conn;
+        } catch (SQLException e) {
+            //e.printStackTrace();
+            parent.getLogger().warning("Error Connecting to MySQL: "+e.getMessage());
+        }
+        return null;
+    }
+
+    private void setup() {
+        try {
+            Connection conn = getConnection();
             // Check if our tables exist, otherwise create them
             PreparedStatement stmt = conn.prepareStatement("SHOW TABLES LIKE '"+prefix+"users';");
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
-            if (!rs.next()) {
-                parent.getLogger().info("Users table doesnt exist! Creating it.");
+            if (!rs.isBeforeFirst()) {
+                parent.getLogger().info("Users table doesn't exist! Creating it.");
                 Statement st = conn.createStatement();
                 String query = "CREATE TABLE IF NOT EXISTS `" + prefix + "users` ( `id` int(11) NOT NULL AUTO_INCREMENT, `uuid` text NOT NULL, `username` text NOT NULL, `nickname` text NOT NULL, `restricted` int(11) NOT NULL, `restrictTime` int(11) NOT NULL, `stamp` int(11) NOT NULL, PRIMARY KEY (`id`));";
                 st.executeUpdate(query);
@@ -47,17 +74,17 @@ public class sqlDatabase extends database {
             stmt = conn.prepareStatement("SHOW TABLES LIKE '"+prefix+"requests';");
             stmt.execute();
             rs = stmt.getResultSet();
-            if (!rs.next()) {
-                parent.getLogger().info("Requests table doesnt exist! Creating it.");
+            if (!rs.isBeforeFirst()) {
+                parent.getLogger().info("Requests table doesn't exist! Creating it.");
                 Statement st = conn.createStatement();
                 String query = "CREATE TABLE IF NOT EXISTS `" + prefix + "requests` ( `id` int(11) NOT NULL AUTO_INCREMENT, `uuid` text NOT NULL, `nickname` text NOT NULL, `status` int(11) NOT NULL, `waiting` int(11) NOT NULL, `stamp` int(11) NOT NULL, PRIMARY KEY (`id`));";
                 st.executeUpdate(query);
             }
         } catch (SQLException ex) {
             // handle any errors
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
+            parent.getLogger().warning("SQLException: " + ex.getMessage());
+            parent.getLogger().warning("SQLState: " + ex.getSQLState());
+            parent.getLogger().warning("VendorError: " + ex.getErrorCode());
             parent.getLogger().warning("Error connecting to MySQL, unable to continue. Disabling self.");
             parent.getServer().getPluginManager().disablePlugin(parent);
         }
@@ -66,13 +93,14 @@ public class sqlDatabase extends database {
     @Override
     public User getUser(UUID uuid) {
         try {
+            Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"users` WHERE `uuid`=?;");
             stmt.setString(1,uuid.toString());
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
 
-            if (rs.next()) {
-                rs.first();
+            if (rs.isBeforeFirst()) {
+                rs.next();
 
                 String username = rs.getString("username");
                 String nickname = rs.getString("nickname");
@@ -96,15 +124,16 @@ public class sqlDatabase extends database {
     private PendingRequest getRequest(UUID uuid) {
         PendingRequest req;
         try {
+            Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"requests` WHERE `uuid`=?;");
             stmt.setString(1,uuid.toString());
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
 
-            if (rs.next()) {
-                rs.first();
+            if (rs.isBeforeFirst()) {
+                rs.next();
 
-                req = new PendingRequest(parent, this,rs.getString("nickname"));
+                req = new PendingRequest(parent, this,rs.getString("nickname"), uuid);
 
                 boolean status = rs.getBoolean("status");
                 boolean waiting = rs.getBoolean("waiting");
@@ -128,6 +157,7 @@ public class sqlDatabase extends database {
     public HashMap<String, User> getUsers() {
         HashMap<String,User> users = new HashMap<String, User>();
         try {
+            Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"users`;");
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
@@ -172,12 +202,14 @@ public class sqlDatabase extends database {
         this.parent.getLogger().info("Update user called on "+u.getUUID());
         try {
             // Handle the user themselves.
+            Connection conn = getConnection();
             PreparedStatement sel_stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"users` WHERE `uuid`=?;");
             sel_stmt.setString(1,u.getUUID().toString());
             sel_stmt.execute();
             ResultSet rs = sel_stmt.getResultSet();
-            if (rs.next()) {
-                rs.first();
+            if (rs.isBeforeFirst()) {
+                rs.next();
+
                 // Update Query
                 PreparedStatement stmt = conn.prepareStatement("UPDATE `"+prefix+"users` SET `nickname`= ?, `username`= ? , `restricted`= ? , `restrictTime`= ? WHERE `uuid`= ? ;");
                 if (u.getNickname() != null) {
@@ -218,14 +250,16 @@ public class sqlDatabase extends database {
 
         PendingRequest req = u.getRequest();
         try {
+            Connection conn = getConnection();
             PreparedStatement sel_stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"requests` WHERE `uuid`=?;");
             sel_stmt.setString(1,u.getUUID().toString());
             sel_stmt.execute();
             ResultSet rs = sel_stmt.getResultSet();
 
             if (req != null) {
-                if (rs.next()) {
-                    rs.first();
+                if (rs.isBeforeFirst()) {
+                    rs.next();
+
                     // Update Query
                     PreparedStatement stmt = conn.prepareStatement("UPDATE `"+prefix+"requests` SET `nickname`= ?, `status`= ? , `waiting`= ? WHERE `uuid`= ? ;");
                     stmt.setString(1, req.getNickname());
@@ -278,12 +312,13 @@ public class sqlDatabase extends database {
     @Override
     public User userViaName(String name) {
         try {
+            Connection conn = getConnection();
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM `"+prefix+"users` WHERE `username` = ?;");
             stmt.setString(1,name);
             stmt.execute();
             ResultSet rs = stmt.getResultSet();
-            if (rs.next()) {
-                rs.first();
+            if (rs.isBeforeFirst()) {
+                rs.next();
 
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 String username = rs.getString("username");

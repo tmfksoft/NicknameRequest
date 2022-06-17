@@ -6,34 +6,12 @@ import com.infermc.nicknamerequest.User;
 import java.util.HashMap;
 import java.util.UUID;
 
-
-public class database {
-
-    public User getUser(UUID uuid) {
-        return null;
-    }
-
-    public HashMap<String, User> getUsers() {
-        return null;
-    }
-
-    public void loadUsers() {
-
-    }
-
-    public void saveUsers() {
-
-    }
-
-    public void updateUser(User u) {
-
-    }
-
-    public boolean nickTaken(String nick) {
-        return false;
-    }
-
-    public User userViaName(String name) {
-        return null;
-    }
+public interface database {
+    User getUser(UUID uuid);
+    HashMap<String, User> getUsers();
+    void loadUsers();
+    void saveUsers();
+    void updateUser(User u);
+    boolean nickTaken(String nick);
+    User userViaName(String name);
 }

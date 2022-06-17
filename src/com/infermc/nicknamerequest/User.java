@@ -44,7 +44,7 @@ public class User {
             if (n != null) {
                 this.plugin.applyNickname(this);
             } else {
-                this.player.setDisplayName(null);
+                this.player.displayName(null);
             }
         }
     }
@@ -93,7 +93,7 @@ public class User {
 
     // Magic
     public PendingRequest newRequest(String nickname) {
-        PendingRequest r = new PendingRequest(this.plugin,this.db,nickname);
+        PendingRequest r = new PendingRequest(this.plugin,this.db,nickname, this.uuid);
         this.setRequest(r);
         return r;
     }

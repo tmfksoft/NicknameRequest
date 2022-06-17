@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="NicknameRequest">
-    <output-path>$PROJECT_DIR$/../../Server/plugins</output-path>
-    <root id="archive" name="NicknameRequest.jar">
-      <element id="module-output" name="NicknameRequest" />
-    </root>
-  </artifact>
-</component>

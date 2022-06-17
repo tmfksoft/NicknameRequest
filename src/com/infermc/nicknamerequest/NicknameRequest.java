@@ -1,17 +1,19 @@
 package com.infermc.nicknamerequest;
 
+import ca.pn.commands.CommandManager;
+import com.infermc.nicknamerequest.commands.NickCommand;
 import com.infermc.nicknamerequest.database.database;
 import com.infermc.nicknamerequest.database.fileDatabase;
 import com.infermc.nicknamerequest.database.sqlDatabase;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,25 +24,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.omg.CORBA.OBJECT_NOT_EXIST;
 
 import java.util.*;
 
-// WARNING! DO NOT LOOK DIRECTLY AT THE SAUCE, FAILIURE TO AVOID LOOKING AT THE SAUCE MAY RESULT IN EYE IRRITATION!
+// WARNING! DO NOT LOOK DIRECTLY AT THE SAUCE, FAILURE TO AVOID LOOKING AT THE SAUCE MAY RESULT IN EYE IRRITATION!
 
 public class NicknameRequest extends JavaPlugin implements Listener {
     // Database
-    private database db = null;
+    public database db = null;
 
     // Providers
-    private Permission perms;
-    private Chat chat;
+    public Permission perms;
+    public Chat chat;
 
     // Other vars
     private boolean debug = false;
 
     // API
     private NicknameAPI api = null;
+    private CommandManager commandManager = new CommandManager(this);
 
     @Override
     public void onEnable() {
@@ -130,7 +132,11 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         }
 
         api = new NicknameAPI(this,db);
+
+        // Register our commands.
+        this.commandManager.registerCommand(new NickCommand(this.commandManager));
     }
+
     @Override
     public void onDisable() {
         if (db != null) {
@@ -141,412 +147,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        // Commands!
-        if (args.length >= 1) {
-            Player player;
-            if (args[0].equalsIgnoreCase("status") && sender.hasPermission("nicknamerequest.status")) {
-                if (sender instanceof Player) {
-                    player = (Player) sender;
-                    if (db.getUser(player.getUniqueId()).getRequest() != null) {
-                        requestStatus(player);
-                    } else {
-                        sender.sendMessage(colourFormat("&bYou don't have a nickname requested currently."));
-                    }
-                } else {
-                    sender.sendMessage(colourFormat("&bOnly users may use this command presently."));
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("request") && sender.hasPermission("nicknamerequest.request")) {
-                if (sender instanceof Player) {
-                    player = (Player) sender;
-                    UUID uid = player.getUniqueId();
-                    if (!db.getUser(uid).isRestricted()) {
-                        if (args.length >= 2) {
-                            //String nick = args[1];
-                            String nick = StringUtils.join(ArrayUtils.subarray(args, 1, args.length), " ");
-                            if (!db.nickTaken(nick)) {
-                                if (!isValid(nick, player)) {
-                                    sender.sendMessage(colourFormat("&cDisallowed nickname! Your nickname contains disallowed formatting!"));
-                                    return true;
-                                }
-                                User u = db.getUser(uid);
-                                // Do we notify staff?
-                                if (u.getRequest() == null) {
-                                    // Yes, It's a new request.
-                                    u.newRequest(nick);
-                                    sender.sendMessage(colourFormat(getString("info-requested",null)));
-
-                                    TextComponent player_str = new TextComponent(colourFormat("&b" + player.getName()));
-                                    TextComponent req_str = new TextComponent(colourFormat("&b has requested the nickname '" + nick + "&r&b'"));
-                                    TextComponent accept = new TextComponent(colourFormat(" &b[ &aAccept &b|"));
-                                    TextComponent deny = new TextComponent(colourFormat(" &cDeny &b]"));
-
-                                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nick accept " + player.getName()));
-                                    accept.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Accept nickname").create()));
-
-                                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nick deny " + player.getName()));
-                                    deny.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Deny nickname").create()));
-
-                                    // If theres perms groups. Add them to the message!
-                                    if (perms != null && chat != null) {
-                                        String group;
-                                        if (player != null) {
-                                            group = chat.getPrimaryGroup(player);
-                                        } else {
-                                            // A feeble attempt.
-                                            group = chat.getPrimaryGroup(getServer().getWorlds().get(0).getName(), getServer().getOfflinePlayer(player.getUniqueId()));
-                                        }
-                                        TextComponent text_group = new TextComponent(" (" + group + ")");
-
-                                        player_str.addExtra(text_group);
-                                    }
-                                    player_str.addExtra(req_str);
-                                    player_str.addExtra(accept);
-                                    player_str.addExtra(deny);
-
-                                    for (Player p : getServer().getOnlinePlayers()) {
-                                        if (p.hasPermission("nicknamerequest.notify")) {
-                                            p.spigot().sendMessage(player_str);
-                                        }
-                                    }
-                                } else {
-                                    // No, update a previous request. Remove the old one.
-                                    sender.sendMessage(colourFormat("&aNickname request updated."));
-
-                                    // Update it.
-                                    u.getRequest().setNickname(args[1]);
-                                }
-                                // TODO Remove and have requests update themselves in the DB
-                                db.updateUser(u);
-                                return true;
-                            } else {
-                                // Nick is in use?
-                                sender.sendMessage(colourFormat("&cThat Nickname is already in use or has already been requested!"));
-                            }
-                        } else {
-                            sender.sendMessage(colourFormat("&bUsage: /nick request nickname"));
-                        }
-                    } else {
-                        if (db.getUser(uid).getRestrictTime() == null) {
-                            sender.sendMessage(colourFormat("&cSorry, you're not allowed to request a nickname indefinitely."));
-                        } else {
-                            Long wait = db.getUser(uid).getRestrictTime() - (new Date().getTime()/1000);
-                            sender.sendMessage(colourFormat("&cSorry, you're not allowed to request a nickname, please wait "+wait+" seconds."));
-                        }
-                    }
-                } else {
-                    sender.sendMessage("This is a User Only Command!");
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("cancel")) {
-                if (sender instanceof Player) {
-                    player = (Player) sender;
-                    UUID uid = player.getUniqueId();
-                    User u = db.getUser(uid);
-                    if (u.getRequest() == null) {
-                        sender.sendMessage(colourFormat("&bYou've not made a nickname request!"));
-                    } else {
-                        u.setRequest(null);
-                        sender.sendMessage(colourFormat("&aNickname Request Cancelled."));
-                    }
-                } else {
-                    sender.sendMessage(colourFormat("&cThis is a User Only Command!"));
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("accept") && sender.hasPermission("nicknamerequest.accept")) {
-                if (args.length >= 2) {
-                    if (db.userViaName(args[1]) != null) {
-                        User u = db.userViaName(args[1]);
-                        if (u.getRequest() != null) {
-                            u.getRequest().setWaiting(false);
-                            u.getRequest().setStatus(true);
-                            if (!u.isRestricted() && getConfig().getLong("accept-cooldown",0) > 0) {
-                                Long rTime = (new Date().getTime()/1000) + getConfig().getLong("accept-cooldown");
-                                u.setRestrictTime(rTime);
-                                u.setRestricted(true);
-                            }
-                            sender.sendMessage(colourFormat("&aNickname successfully accepted."));
-
-                            for (Player p : getServer().getOnlinePlayers()) {
-                                if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&bThe nickname '&r&f"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &a&laccepted&r&b by "+sender.getName()));
-                                }
-                            }
-                            // THIS NEEDS SORTING
-                            // TODO
-                            if (getServer().getPlayer(u.getUUID()) != null) customJoin(getServer().getPlayer(u.getUUID()));
-                        } else {
-                            sender.sendMessage(colourFormat("&cThat user hasn't requested a nickname!"));
-                        }
-                    } else {
-                        sender.sendMessage(colourFormat("&cNo such user!"));
-                    }
-                } else {
-                    sender.sendMessage(colourFormat("&cSyntax: /nick accept username"));
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("deny") && sender.hasPermission("nicknamerequest.deny")) {
-                if (args.length >= 2) {
-                    if (db.userViaName(args[1]) != null) {
-                        User u = db.userViaName(args[1]);
-                        if (u.getRequest() != null) {
-                            u.getRequest().setWaiting(false);
-                            u.getRequest().setStatus(false);
-                            if (!u.isRestricted() && getConfig().getLong("deny-cooldown",0) > 0) {
-                                Long rTime = (new Date().getTime()/1000) + getConfig().getLong("deny-cooldown");
-                                u.setRestrictTime(rTime);
-                                u.setRestricted(true);
-                            }
-                            sender.sendMessage(colourFormat("&aNickname successfully denied."));
-
-                            for (Player p : getServer().getOnlinePlayers()) {
-                                if (p.hasPermission("nicknamerequest.notify")) {
-                                    p.sendMessage(colourFormat("&bThe nickname '&r&f"+u.getRequest().getNickname()+ "&b' by "+u.getUsername()+" has been &c&ldenied&r&b by "+sender.getName()));
-                                }
-                            }
-
-                            // THIS NEEDS SORTING
-                            // TODO
-                            if (getServer().getPlayer(u.getUUID()) != null) customJoin(getServer().getPlayer(u.getUUID()));
-
-                        } else {
-                            sender.sendMessage(colourFormat("&cThat user hasn't requested a nickname!"));
-                        }
-                    } else {
-                        sender.sendMessage(colourFormat("&cNo such user!"));
-                    }
-                } else {
-                    sender.sendMessage(colourFormat("&cSyntax: /nick deny username"));
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("set") && sender.hasPermission("nicknamerequest.set")) {
-                if (args.length == 2) {
-                    // Self
-                    if (sender instanceof Player) {
-                        player = (Player) sender;
-                        User u = db.getUser(player.getUniqueId());
-                        // Update users nicknamerequest.
-                        u.setNickname(args[1]);
-                        sender.sendMessage(colourFormat("&bYour nickname was changed to &r"+args[1]));
-                    } else {
-                        sender.sendMessage("Syntax: /nick set username nickname");
-                    }
-                } else if (args.length >= 3) {
-                    // Other
-                    if (db.userViaName(args[1]) != null) {
-                        User u = db.userViaName(args[1]);
-                        u.setNickname(args[2]);
-                        sender.sendMessage(colourFormat("&bThe nickname of "+u.getUsername()+" was changed to "+args[2]));
-                    } else {
-                        sender.sendMessage(colourFormat("&cNo such user!"));
-                    }
-                } else {
-                    sender.sendMessage("Syntax: /nick set [username] nickname");
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("list") && sender.hasPermission("nicknamerequest.list")) {
-                // Lists pending requests
-                sender.sendMessage(colourFormat("&2Outstanding Nickname Requests:"));
-                int count = 0;
-                for (Map.Entry<String,User> u : db.getUsers().entrySet()) {
-                    if (u.getValue().getRequest() != null) {
-                        if (u.getValue().getRequest().isWaiting()) {
-                            User user = u.getValue();
-                            String nick = colourFormat(user.getRequest().getNickname() + "&r");
-
-                            TextComponent req_str = new TextComponent(colourFormat("   &9- &r&f" + nick + "&9 by " + user.getUsername()));
-                            TextComponent accept = new TextComponent(colourFormat(" &b[ &aAccept &b|"));
-                            TextComponent deny = new TextComponent(colourFormat(" &cDeny &b]"));
-
-                            accept.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick accept "+user.getUsername() ) );
-                            accept.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Accept nickname").create() ) );
-
-                            deny.setClickEvent( new ClickEvent( ClickEvent.Action.RUN_COMMAND, "/nick deny "+user.getUsername() ) );
-                            deny.setHoverEvent( new HoverEvent( HoverEvent.Action.SHOW_TEXT, new ComponentBuilder("Deny nickname").create() ) );
-
-                            // If theres perms groups. Add them to the message!
-                            if (perms != null && chat != null) {
-                                String group;
-                                if (user.getPlayer() != null) {
-                                    group = chat.getPrimaryGroup(user.getPlayer());
-                                } else {
-                                    // A feeble attempt.
-                                    group = chat.getPrimaryGroup(getServer().getWorlds().get(0).getName(),getServer().getOfflinePlayer(user.getRequest().getUUID()));
-                                }
-                                TextComponent text_group = new TextComponent(" (" + group + ")");
-
-                                req_str.addExtra(text_group);
-                            }
-
-                            if (sender instanceof Player) {
-                                // If they're a player send the fancy string.
-                                player = (Player) sender;
-
-                                // Only for players, useless as server can't click :P
-                                req_str.addExtra(accept);
-                                req_str.addExtra(deny);
-
-                                player.spigot().sendMessage(req_str);
-                            } else {
-                                sender.sendMessage(req_str.toLegacyText());
-                            }
-                            count++;
-                        }
-                    }
-                }
-                if (count == 0) sender.sendMessage(colourFormat("   &9There are no requests."));
-                sender.sendMessage(colourFormat("&2Accept/Deny any request via &a/nick accept|deny username"));
-                return true;
-            } else if (args[0].equalsIgnoreCase("remove")) {
-                // Disable your nickname or another users.
-                if (args.length == 1) {
-                    // Self.
-                    if (sender.hasPermission("nicknamerequest.remove.self")) {
-                        if (sender instanceof Player) {
-                            player = (Player) sender;
-                            sender.sendMessage(colourFormat("&bNickname removed!"));
-                            player.setDisplayName(null);
-                            User u = db.getUser(player.getUniqueId());
-                            u.setNickname(null);
-                        } else {
-                            sender.sendMessage("Syntax: /nick remove username");
-                        }
-                    }
-                } else {
-                    // Other user.
-                    if (sender.hasPermission("nicknamerequest.remove.others")) {
-                        if (db.userViaName(args[1]) != null) {
-                            User u = db.userViaName(args[1]);
-                            u.setNickname(null);
-                            if (u.getPlayer() != null) u.getPlayer().setDisplayName(null);
-                            sender.sendMessage(colourFormat("&bNickname for " + u.getUsername() + " removed!"));
-                        } else {
-                            sender.sendMessage(colourFormat("&cNo such user!"));
-                        }
-                    }
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("version")) {
-                sender.sendMessage(colourFormat("PendingRequest version "+this.getDescription().getVersion()));
-                sender.sendMessage(colourFormat("Nickname Requester - Easy nickname management for users and staff."));
-                sender.sendMessage(colourFormat("Author: Thomas Edwards (TMFKSOFT/MajesticFudgie)"));
-                return true;
-            } else if (args[0].equalsIgnoreCase("restrict") && sender.hasPermission("nicknamerequest.restrict")) {
-                // THIS NEEDS SORTING
-                // TODO
-                if (args.length >= 2) {
-                    if (db.userViaName(args[1]) != null) {
-                        User u = db.userViaName(args[1]);
-                        u.setRestricted(true);
-                        Long rTime = null;
-                        if (args.length == 3) {
-                            rTime = parseTime(args[2]);
-                            if (rTime == null) {
-                                sender.sendMessage(colourFormat("&cInvalid time format, units of time must be singular and end in s(econds), m(inutes), h(hours) or d(days)! E.g. 24h"));
-                                return true;
-                            }
-                            long curTime = (new Date().getTime() / 1000)+rTime;
-                            u.setRestrictTime(curTime);
-                        }
-                        if (rTime == null) {
-                            sender.sendMessage(colourFormat("&aNickname request access for " + u.getUsername() + " is now restricted."));
-                        } else {
-                            sender.sendMessage(colourFormat("&aNickname request access for " + u.getUsername() + " is now restricted for "+rTime+" seconds."));
-                        }
-                    } else {
-                        sender.sendMessage(colourFormat("&cNo such user!"));
-                    }
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("unrestrict") && sender.hasPermission("nicknamerequest.restrict")) {
-                // TODO
-                if (args.length >= 2) {
-                    if (db.userViaName(args[1]) != null) {
-                        User u = db.userViaName(args[1]);
-                        u.setRestricted(false);
-                        sender.sendMessage(colourFormat("&aNickname request access for " + u.getUsername() + " is no longer restricted."));
-                    } else {
-                        sender.sendMessage(colourFormat("&cNo such user!"));
-                    }
-                } else {
-                    sender.sendMessage("Syntax: /nick unrestrict username");
-                }
-                return true;
-            } else if (args[0].equalsIgnoreCase("info") && (sender.hasPermission("nicknamerequest.info") || sender.hasPermission("nicknamerequest.info.others"))) {
-                if (sender instanceof Player && args.length == 1) {
-                    player = (Player) sender;
-                    UUID uid = player.getUniqueId();
-                    User u = db.getUser(uid);
-                    HashMap<String, Object> langFields = new HashMap<String, Object>();
-                    if (u.getNickname() == null) {
-                        sender.sendMessage(colourFormat(getString("info-self-no-nick",null)));
-                    } else {
-                        langFields.put("nick",u.getNickname());
-                        sender.sendMessage(colourFormat(getString("info-self-current-nick",langFields)));
-                    }
-                    if (u.getRequest() == null) {
-                        sender.sendMessage(colourFormat(getString("info-self-no-request",null)));
-                    } else {
-                        PendingRequest req = u.getRequest();
-                        langFields.put("nick",req.getNickname());
-                        sender.sendMessage(colourFormat(getString("info-self-current-request",langFields)));
-                    }
-                    if (!u.isRestricted()) {
-                        sender.sendMessage(colourFormat(getString("info-self-not-restricted",null)));
-                    } else {
-                        if (u.getRestrictTime() == null) {
-                            sender.sendMessage(colourFormat(getString("info-self-perm-restricted",null)));
-                        } else {
-                            Long wait = u.getRestrictTime() - (new Date().getTime() / 1000);
-                            langFields.put("time",wait);
-                            sender.sendMessage(colourFormat(getString("info-self-timed-restricted",langFields)));
-                        }
-                    }
-                } else if (args.length > 1) {
-                    if (sender.hasPermission("nicknamerequest.info.others")) {
-                        User u = db.userViaName(args[1]);
-                        if (u != null) {
-                            HashMap<String, Object> langFields = new HashMap<String, Object>();
-                            langFields.put("username", u.getUsername());
-                            if (u.getNickname() == null) {
-                                sender.sendMessage(colourFormat(getString("info-other-no-nick", langFields)));
-                            } else {
-                                langFields.put("nick", u.getNickname());
-                                sender.sendMessage(colourFormat(getString("info-other-current-nick", langFields)));
-                            }
-                            if (u.getRequest() == null) {
-                                sender.sendMessage(colourFormat(getString("info-other-no-request", langFields)));
-                            } else {
-                                PendingRequest req = u.getRequest();
-                                langFields.put("nick", req.getNickname());
-                                sender.sendMessage(colourFormat(getString("info-other-current-request", langFields)));
-                            }
-                            if (!u.isRestricted()) {
-                                sender.sendMessage(colourFormat(getString("info-other-not-restricted", langFields)));
-                            } else {
-                                if (u.getRestrictTime() == null) {
-                                    sender.sendMessage(colourFormat(getString("info-other-perm-restricted", langFields)));
-                                } else {
-                                    Long wait = u.getRestrictTime() - (new Date().getTime() / 1000);
-                                    langFields.put("time", wait);
-                                    sender.sendMessage(colourFormat(getString("info-other-timed-restricted", langFields)));
-                                }
-                            }
-                        } else {
-                            sender.sendMessage(colourFormat(getString("standard-invalid-user",null)));
-                        }
-                    } else {
-                        sender.sendMessage(colourFormat(getString("info-other-denied",null)));
-                    }
-                } else {
-                    sender.sendMessage(colourFormat(getString("standard-user-only-cmd",null)));
-                }
-                return true;
-            }
-        } else {
-            return true;
-        }
-        return true;
+        return this.commandManager.onCommand(sender, cmd, label, args);
     }
 
     @EventHandler
@@ -564,7 +165,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         return this.api;
     }
 
-    protected void customJoin(Player player) {
+    public void customJoin(Player player) {
         UUID uid = player.getUniqueId();
         User u = db.getUser(uid);
         // If we loaded their nick, apply it!
@@ -574,7 +175,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
             if (u.getNickname() != null) applyNickname(u);
         } else {
             // No such user, create them
-            getLogger().info("Created user.");
+            getLogger().info("Creating user.");
 
             boolean restricted = false;
             Long restrictTime = 0L;
@@ -588,6 +189,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
 
             u = new User(this,this.db,uid,player.getName(),null,restricted,restrictTime,null);
             u.setPlayer(player);
+            this.db.updateUser(u);
         }
 
         // Update their request status
@@ -606,15 +208,18 @@ public class NicknameRequest extends JavaPlugin implements Listener {
             format = format.replace("{SUFFIX}",chat.getPlayerSuffix(player));
             format = format.replace("{GROUP}",chat.getPrimaryGroup(player));
         }
-        player.setDisplayName(colourFormat(format + "&r"));
+        player.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize(format + "&r"));
     }
 
     private void customQuit(Player player) {
         // Remove their player.
-        db.getUser(player.getUniqueId()).setPlayer(null);
+        User existingUser = db.getUser(player.getUniqueId());
+        if (existingUser != null) {
+            existingUser.setPlayer(null);
+        }
     }
 
-    private void requestStatus(Player player) {
+    public void requestStatus(Player player) {
         // Check if they've got a pending request.
         User u = db.getUser(player.getUniqueId());
         if (u == null) return;
@@ -645,7 +250,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
     public String colourFormat(String msg) {
         return ChatColor.translateAlternateColorCodes('&',msg);
     }
-    private Long parseTime(String time) {
+    public Long parseTime(String time) {
         // Parse a simple time string into seconds.
         String unit = time.substring(time.length()-1).trim();
         String dur = time.substring(0,time.length()-1);
@@ -672,7 +277,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         return duration;
     }
 
-    private boolean isValid(String nick, Player player) {
+    public boolean isValid(String nick, Player player) {
         // Convert to lowercase for the sake of sanity.
         nick = nick.toLowerCase();
 
@@ -735,7 +340,7 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         chat = rsp.getProvider();
         return chat != null;
     }
-    private String getString(String name,HashMap<String,Object> fields) {
+    public String getString(String name, HashMap<String, Object> fields) {
         ConfigurationSection section = getConfig().getConfigurationSection("messages");
         if (section == null) {
             getLogger().info("Unable to get language string '"+name.toLowerCase()+"'! Messages config section doesn't exist!");
