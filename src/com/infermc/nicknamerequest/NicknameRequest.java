@@ -155,11 +155,6 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         customJoin(event.getPlayer());
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        customQuit(event.getPlayer());
-    }
-
     // Custom functions
     public NicknameAPI getNicknameAPI() {
         return this.api;
@@ -170,7 +165,6 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         User u = db.getUser(uid);
         // If we loaded their nick, apply it!
         if (u != null) {
-            u.setPlayer(player);
             if (!u.getUsername().equals(player.getName())) u.setUsername(player.getName());
             if (u.getNickname() != null) applyNickname(u);
         } else {
@@ -188,7 +182,6 @@ public class NicknameRequest extends JavaPlugin implements Listener {
             }
 
             u = new User(this,this.db,uid,player.getName(),null,restricted,restrictTime,null);
-            u.setPlayer(player);
             this.db.updateUser(u);
         }
 
@@ -196,9 +189,14 @@ public class NicknameRequest extends JavaPlugin implements Listener {
         requestStatus(player);
     }
 
-    protected void applyNickname(User u) {
+    public void applyNickname(User u) {
         String nickname = u.getNickname();
         Player player = u.getPlayer();
+
+        // If they're not online. Skip doing anything.
+        if (player == null) {
+            return;
+        }
 
         String format = getConfig().getString("nick-format");
         format = format.replace("{NICK}",nickname);
@@ -209,14 +207,6 @@ public class NicknameRequest extends JavaPlugin implements Listener {
             format = format.replace("{GROUP}",chat.getPrimaryGroup(player));
         }
         player.displayName(LegacyComponentSerializer.legacyAmpersand().deserialize(format + "&r"));
-    }
-
-    private void customQuit(Player player) {
-        // Remove their player.
-        User existingUser = db.getUser(player.getUniqueId());
-        if (existingUser != null) {
-            existingUser.setPlayer(null);
-        }
     }
 
     public void requestStatus(Player player) {

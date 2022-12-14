@@ -52,9 +52,6 @@ public class User {
         username = u;
         db.updateUser(this);
     }
-    public void setPlayer(Player p) {
-        player = p;
-    }
     public void setRestricted(boolean r) {
         if (restricted != r) {
             restricted = r;
@@ -85,7 +82,12 @@ public class User {
         return username;
     }
     public Player getPlayer() {
-        return player;
+        for (Player player : this.plugin.getServer().getOnlinePlayers()) {
+            if (player.getName().equalsIgnoreCase(this.username)) {
+                return player;
+            }
+        }
+        return null;
     }
     public boolean getRestricted() { return restricted; }
     public Long getRestrictTime() { return restrictTime; }

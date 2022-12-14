@@ -4,14 +4,12 @@ import ca.pn.commands.Command;
 import ca.pn.commands.CommandManager;
 import com.infermc.nicknamerequest.NicknameRequest;
 import com.infermc.nicknamerequest.User;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyFormat;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -38,7 +36,6 @@ public class RequestCommand extends Command {
                 UUID uid = player.getUniqueId();
                 if (!plugin.db.getUser(uid).isRestricted()) {
                     if (args.length >= 2) {
-                        //String nick = args[1];
                         String nick = StringUtils.join(ArrayUtils.subarray(args, 1, args.length), " ");
                         if (!plugin.db.nickTaken(nick)) {
                             if (!plugin.isValid(nick, player)) {

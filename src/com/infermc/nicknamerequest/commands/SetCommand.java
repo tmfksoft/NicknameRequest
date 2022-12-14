@@ -30,6 +30,7 @@ public class SetCommand extends Command {
                 User u = plugin.db.getUser(player.getUniqueId());
                 // Update users nicknamerequest.
                 u.setNickname(args[0]);
+                plugin.applyNickname(u);
                 sender.sendMessage(plugin.colourFormat("&bYour nickname was changed to &r"+args[0]));
             } else {
                 sender.sendMessage("Syntax: /nick set username nickname");
@@ -39,6 +40,9 @@ public class SetCommand extends Command {
             if (plugin.db.userViaName(args[0]) != null) {
                 User u = plugin.db.userViaName(args[0]);
                 u.setNickname(args[1]);
+
+                plugin.applyNickname(u);
+
                 sender.sendMessage(plugin.colourFormat("&bThe nickname of "+u.getUsername()+" was changed to "+args[1]));
             } else {
                 sender.sendMessage(plugin.colourFormat("&cNo such user!"));
