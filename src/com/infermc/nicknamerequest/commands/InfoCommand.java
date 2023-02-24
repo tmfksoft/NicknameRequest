@@ -24,7 +24,7 @@ public class InfoCommand extends Command {
 	@Override
 	public boolean onCall(CommandSender sender, String[] args) {
 		NicknameRequest plugin = (NicknameRequest) this.manager.parentPlugin;
- 		if (sender instanceof Player && args.length == 1) {
+ 		if (sender instanceof Player && args.length == 0) {
 			Player player = (Player) sender;
 			UUID uid = player.getUniqueId();
 			User u = plugin.db.getUser(uid);
@@ -53,7 +53,7 @@ public class InfoCommand extends Command {
 					sender.sendMessage(plugin.colourFormat(plugin.getString("info-self-timed-restricted",langFields)));
 				}
 			}
-		} else if (args.length > 1) {
+		} else if (args.length >= 1) {
 			if (sender.hasPermission("nicknamerequest.info.others")) {
 				User u = plugin.db.userViaName(args[1]);
 				if (u != null) {

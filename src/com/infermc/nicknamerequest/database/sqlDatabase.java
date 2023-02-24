@@ -3,6 +3,8 @@ package com.infermc.nicknamerequest.database;
 import com.infermc.nicknamerequest.NicknameRequest;
 import com.infermc.nicknamerequest.PendingRequest;
 import com.infermc.nicknamerequest.User;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -10,7 +12,9 @@ import java.sql.*;
 import java.util.*;
 
 public class sqlDatabase implements database {
-    private Connection connection = null;
+    private HikariDataSource connection = null;
+
+    private HikariConfig config = null;
     private NicknameRequest parent;
     private String prefix;
 
@@ -20,21 +24,20 @@ public class sqlDatabase implements database {
         setup();
     }
 
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                Connection conn = createConnection();
-                this.connection = conn;
-                return conn;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            this.connection = null;
+    public Connection getConnection() throws SQLException {
+        if (this.connection == null) {
+            HikariDataSource dt = this.createConnection();
+            return dt.getConnection();
         }
-        return connection;
+        if (this.connection.isClosed()) {
+            HikariDataSource dt = this.createConnection();
+            return dt.getConnection();
+        }
+        return this.connection.getConnection();
     }
 
-    private Connection createConnection() {
+    private HikariDataSource createConnection() {
+        this.parent.getLogger().info("Creating database pool");
         ConfigurationSection databaseConfig = parent.getConfig().getConfigurationSection("database");
         String host = databaseConfig.getString("host");
         String port = databaseConfig.getString("port");
@@ -43,16 +46,11 @@ public class sqlDatabase implements database {
         prefix = databaseConfig.getString("prefix");
         String database = databaseConfig.getString("database");
 
-        Connection conn;
-        try {
-            conn = DriverManager.getConnection("jdbc:mysql://"+host+":"+port+"/"+database+"?user="+username+"&password="+password);
-            parent.getLogger().info("Connected to database!");
-            return conn;
-        } catch (SQLException e) {
-            //e.printStackTrace();
-            parent.getLogger().warning("Error Connecting to MySQL: "+e.getMessage());
-        }
-        return null;
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://"+host+":"+port+"/"+database+"?user="+username+"&password="+password);
+        this.config = config;
+        this.connection = new HikariDataSource(config);
+        return this.connection;
     }
 
     private void setup() {
@@ -80,6 +78,7 @@ public class sqlDatabase implements database {
                 String query = "CREATE TABLE IF NOT EXISTS `" + prefix + "requests` ( `id` int(11) NOT NULL AUTO_INCREMENT, `uuid` text NOT NULL, `nickname` text NOT NULL, `status` int(11) NOT NULL, `waiting` int(11) NOT NULL, `stamp` int(11) NOT NULL, PRIMARY KEY (`id`));";
                 st.executeUpdate(query);
             }
+            conn.close();
         } catch (SQLException ex) {
             // handle any errors
             parent.getLogger().warning("SQLException: " + ex.getMessage());
@@ -113,8 +112,10 @@ public class sqlDatabase implements database {
                 User u = new User(this.parent,this,uuid,username,nickname,restricted,restrictTime,getRequest(uuid));
 
                 rs.close();
+                conn.close();
                 return u;
             }
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -143,8 +144,10 @@ public class sqlDatabase implements database {
                 req.setWaiting(waiting);
                 req.setRequestTime(requestTime);
                 rs.close();
+                conn.close();
                 return req;
             } else {
+                conn.close();
                 return null;
             }
         } catch (SQLException e) {
@@ -178,6 +181,7 @@ public class sqlDatabase implements database {
                 users.put(uuid.toString(),u);
             }
             rs.close();
+            conn.close();
             return users;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -244,6 +248,7 @@ public class sqlDatabase implements database {
             }
             rs.close();
             sel_stmt.close();
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -287,6 +292,7 @@ public class sqlDatabase implements database {
             }
             rs.close();
             sel_stmt.close();
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -329,9 +335,10 @@ public class sqlDatabase implements database {
                 boolean restricted = rs.getBoolean("restricted");
                 long restrictTime = 0L;
                 if (restricted) restrictTime = rs.getLong("restrictTime");
-
+                conn.close();
                 return new User(this.parent,this,uuid,username,nickname,restricted,restrictTime,getRequest(uuid));
             }
+            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
